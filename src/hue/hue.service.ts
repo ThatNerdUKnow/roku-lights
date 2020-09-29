@@ -7,10 +7,16 @@ export class HueService {
 
    constructor(private http:HttpService)
    {
-
+    this.setColor(255,0,0);
    }
 
+   private color;
    private username;
+
+   setColor(r:number,g:number,b:number)
+   {
+        this.color = {r,g,b}
+   }
 
     async discover()
     {
