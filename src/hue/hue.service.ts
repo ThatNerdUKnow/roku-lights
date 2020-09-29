@@ -101,16 +101,39 @@ export class HueService {
   }
 
   pollRoku() {
-    setInterval(()=>{
-        this.http
+    setInterval(() => {
+      this.http
         .get('http://192.168.0.120:8060/query/media-player')
         .toPromise()
         .then(res => {
-          console.log(res.data);
-        })
-    },5000);
-       
-      
+          let parseString = require('xml2js').parseString;
+          parseString(res.data, (err, result) => {
+            let state = result.player.$.state;
+            if (state === 'play') {
+              this.lightsDown();
+            } else if (state === 'pause') {
+              this.lightsUp();
+            } else if (state === 'close') {
+              this.http
+                .get('http://192.168.0.120:8060/query/active-app')
+                .toPromise()
+                .then(res => {
+                    parseString(res.data,(err,result)=>{
+                        console.log(result);
+                        result = JSON.stringify(result);
+                        if(!result.includes("Roku"))
+                        {
+                            // Do nothing
+                            this.lightsUp();
+                        }
+                    })
+                });
+
+              
+            }
+          });
+        });
+    }, 5000);
   }
 
   onModuleInit() {
