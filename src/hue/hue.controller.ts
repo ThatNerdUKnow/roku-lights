@@ -1,6 +1,7 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, Post } from '@nestjs/common';
 import {HueService} from './hue.service';
 import { stringify } from 'querystring';
+import { get } from 'http';
 
 @Controller('hue')
 export class HueController {
@@ -10,7 +11,12 @@ export class HueController {
     constructor(private hueService:HueService)
     {}
 
-    
+    @Get("/color")
+    setColor(@Query("hue")hue:number)
+    {
+        return this.hueService.setColor(hue);
+    }
+
 
     @Get("/discover")
     async discover()

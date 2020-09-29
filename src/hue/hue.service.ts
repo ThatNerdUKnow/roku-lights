@@ -1,4 +1,4 @@
-import { Injectable, HttpService } from '@nestjs/common';
+import { Injectable, HttpService, HttpException, HttpCode, HttpStatus } from '@nestjs/common';
 
 
 @Injectable()
@@ -7,15 +7,22 @@ export class HueService {
 
    constructor(private http:HttpService)
    {
-    this.setColor(255,0,0);
+    this.setColor(0);
    }
 
    private color;
    private username;
 
-   setColor(r:number,g:number,b:number)
+   setColor(hue:number)
    {
-        this.color = {r,g,b}
+      if(hue <= 65535|| hue >=0)
+      {
+        this.color = hue;
+      }
+      else
+      {
+          throw new HttpException("Maximum value is 65535",HttpStatus.INTERNAL_SERVER_ERROR);
+      }
    }
 
     async discover()
