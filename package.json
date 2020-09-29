@@ -26,6 +26,7 @@
     "@nestjs/platform-express": "^7.0.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
+    "roku-client": "^4.2.0",
     "rxjs": "^6.5.4",
     "xml2js": "^0.4.23"
   },
