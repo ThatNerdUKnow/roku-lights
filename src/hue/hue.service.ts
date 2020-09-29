@@ -36,6 +36,42 @@ export class HueService {
         return ipRange
     }
 
+
+    async lightsDown()
+    {
+        /*
+        PUT
+        http://192.168.0.167/api/ZVJgckeiew82iNZ8Ip1A-wkrbzObC7JQbsCHXMJw/groups/1/action
+        {
+            "on":true,
+            "hue":9220,
+            "bri":254
+        }
+        */
+        await this.http.put("http://192.168.0.167/api/ZVJgckeiew82iNZ8Ip1A-wkrbzObC7JQbsCHXMJw/groups/1/action",{
+            "on":true,
+            "hue":0,
+            "bri":254,
+            "sat":254
+        }).toPromise().then((res)=>{
+            console.log(res.data);
+        });
+        return true;
+
+    }
+
+    async lightsUp()
+    {
+        await this.http.put("http://192.168.0.167/api/ZVJgckeiew82iNZ8Ip1A-wkrbzObC7JQbsCHXMJw/groups/1/action",{
+            "on":true,
+            "hue":0,
+            "bri":254,
+            "sat":0
+        }).toPromise().then((res)=>{
+            console.log(res.data);
+        });
+        return true;
+    }
     async register(ip:string)
     {
         let body = {"devicetype":"roku-lights"}

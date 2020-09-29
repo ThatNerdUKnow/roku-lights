@@ -17,7 +17,6 @@ export class HueController {
         return this.hueService.setColor(hue);
     }
 
-
     @Get("/discover")
     async discover()
     {
