@@ -38,6 +38,13 @@ export class HueService {
 
   private settings: settingsDTO = new settingsDTO();
 
+  setGroup(group:number)
+  {
+    this.settings.hueGroup = group;
+    this.saveData();
+    return "Group has been set";
+  }
+
   setColor(hue: number) {
     if (hue <= 65535 || hue >= 0) {
       this.settings.hue = hue;
@@ -81,10 +88,10 @@ export class HueService {
         */
     await this.http
       .put(
-        `http://${this.settings.bridgeIp}/api/ZVJgckeiew82iNZ8Ip1A-wkrbzObC7JQbsCHXMJw/groups/1/action`,
+        `http://${this.settings.bridgeIp}/api/ZVJgckeiew82iNZ8Ip1A-wkrbzObC7JQbsCHXMJw/groups/${this.settings.hueGroup}/action`,
         {
           on: true,
-          hue: 0,
+          hue: this.settings.hue,
           bri: 254,
           sat: 254,
         },
@@ -99,7 +106,7 @@ export class HueService {
   async lightsUp() {
     await this.http
       .put(
-        `http://${this.settings.bridgeIp}/api/ZVJgckeiew82iNZ8Ip1A-wkrbzObC7JQbsCHXMJw/groups/1/action`,
+        `http://${this.settings.bridgeIp}/api/ZVJgckeiew82iNZ8Ip1A-wkrbzObC7JQbsCHXMJw/groups/${this.settings.hueGroup}/action`,
         {
           on: true,
           hue: 0,

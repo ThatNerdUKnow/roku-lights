@@ -11,6 +11,12 @@ export class HueController {
     constructor(private hueService:HueService)
     {}
 
+    @Get("/group")
+    setGroup(@Query("group")group:number)
+    {
+        return this.hueService.setGroup(group);
+    }
+    
     @Get("/color")
     setColor(@Query("hue")hue:number)
     {
