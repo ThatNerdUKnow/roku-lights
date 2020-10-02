@@ -17,6 +17,12 @@ export class HueController {
         return this.hueService.setColor(hue);
     }
 
+    @Get("/roku")
+    setRoku(@Query("ip") ip:string)
+    {
+        return this.hueService.setRokuIP(ip);
+    }
+
     @Get("/discover")
     async discover()
     {
@@ -30,6 +36,7 @@ export class HueController {
     {
         
         let data= await this.hueService.register(bridge);
+        this.hueService.setHueIP(bridge);
         return data;
     }
 }

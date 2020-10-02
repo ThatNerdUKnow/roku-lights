@@ -5,19 +5,44 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import * as fs from 'file-system';
+import { settingsDTO } from './settingsDTO';
+import * as jsonfile from 'jsonfile';
 
 @Injectable()
 export class HueService {
   constructor(private http: HttpService) {
-    this.setColor(0);
+    // this.setColor(0);
+    // Get our settings here
+
+    
   }
 
-  private color;
-  private username;
+  async getSettings() {
+    try {
+      let test = jsonfile.readFile('settings.json').then(result => {
+        this.settings = result;
+        if(this.settings === new settingsDTO())
+        {
+          console.log("The api won't work until all settings are set");
+        }
+        else
+        {
+        console.log(this.settings);
+        }
+      });
+    } catch {
+      console.log("Couldn't get settings from settings.json")
+    }
+  }
+
+  private settings: settingsDTO = new settingsDTO();
 
   setColor(hue: number) {
     if (hue <= 65535 || hue >= 0) {
-      this.color = hue;
+      this.settings.hue = hue;
+      this.saveData();
+      return 'Color has set sucessfully';
     } else {
       throw new HttpException(
         'Maximum value is 65535',
@@ -38,6 +63,12 @@ export class HueService {
     return ipRange;
   }
 
+  setHueIP(ip: string) {
+    this.settings.bridgeIp = ip;
+    this.saveData();
+    return 'Hue Bridge IP updated';
+  }
+
   async lightsDown() {
     /*
         PUT
@@ -50,7 +81,7 @@ export class HueService {
         */
     await this.http
       .put(
-        'http://192.168.0.167/api/ZVJgckeiew82iNZ8Ip1A-wkrbzObC7JQbsCHXMJw/groups/1/action',
+        `http://${this.settings.bridgeIp}/api/ZVJgckeiew82iNZ8Ip1A-wkrbzObC7JQbsCHXMJw/groups/1/action`,
         {
           on: true,
           hue: 0,
@@ -68,7 +99,7 @@ export class HueService {
   async lightsUp() {
     await this.http
       .put(
-        'http://192.168.0.167/api/ZVJgckeiew82iNZ8Ip1A-wkrbzObC7JQbsCHXMJw/groups/1/action',
+        `http://${this.settings.bridgeIp}/api/ZVJgckeiew82iNZ8Ip1A-wkrbzObC7JQbsCHXMJw/groups/1/action`,
         {
           on: true,
           hue: 0,
@@ -82,6 +113,7 @@ export class HueService {
       });
     return true;
   }
+
   async register(ip: string) {
     let body = { devicetype: 'roku-lights' };
     let data;
@@ -90,20 +122,20 @@ export class HueService {
       .toPromise()
       .then(response => {
         try {
-          this.username = response.data[0].success.username;
-          console.log(this.username);
+          this.settings.username = response.data[0].success.username;
         } catch (err) {
           console.log(err);
         }
         data = response.data;
       });
+    this.saveData();
     return data;
   }
 
   pollRoku() {
     setInterval(() => {
       this.http
-        .get('http://192.168.0.120:8060/query/media-player')
+        .get(`http://${this.settings.rokuIP}:8060/query/media-player`)
         .toPromise()
         .then(res => {
           let parseString = require('xml2js').parseString;
@@ -118,26 +150,38 @@ export class HueService {
                 .get('http://192.168.0.120:8060/query/active-app')
                 .toPromise()
                 .then(res => {
-                    parseString(res.data,(err,result)=>{
-                        console.log(result);
-                        result = JSON.stringify(result);
-                        if(!result.includes("Roku"))
-                        {
-                            // Do nothing
-                            this.lightsUp();
-                        }
-                    })
+                  parseString(res.data, (err, result) => {
+                    
+                    result = JSON.stringify(result);
+                    if (!result.includes('Roku')) {
+                      // Do nothing
+                      this.lightsUp();
+                    }
+                  });
                 });
-
-              
             }
           });
         });
     }, 5000);
   }
 
-  onModuleInit() {
-    console.log('init');
+  setRokuIP(ip: string) {
+    this.settings.rokuIP = ip;
+    this.saveData();
+    return 'Roku IP Updated';
+  }
+  saveData() {
+    fs.writeFile('settings.json', JSON.stringify(this.settings));
+  }
+
+ async onModuleInit() {
+   
+    await this.getSettings().then(()=>{
+      
+    });
     this.pollRoku();
+      
+    
+    
   }
 }
