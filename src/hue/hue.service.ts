@@ -42,6 +42,7 @@ export class HueService {
   {
     this.settings.hueGroup = group;
     this.saveData();
+    console.log("Group has been set");
     return "Group has been set";
   }
 
@@ -49,6 +50,7 @@ export class HueService {
     if (hue <= 65535 || hue >= 0) {
       this.settings.hue = hue;
       this.saveData();
+      console.log("Color set successfully");
       return 'Color has set sucessfully';
     } else {
       throw new HttpException(
@@ -73,6 +75,7 @@ export class HueService {
   setHueIP(ip: string) {
     this.settings.bridgeIp = ip;
     this.saveData();
+    console.log("Hue bridge IP updated");
     return 'Hue Bridge IP updated';
   }
 
@@ -136,6 +139,7 @@ export class HueService {
         data = response.data;
       });
     this.saveData();
+    console.log("Registered Hue Bridge");
     return data;
   }
 
@@ -175,6 +179,7 @@ export class HueService {
   setRokuIP(ip: string) {
     this.settings.rokuIP = ip;
     this.saveData();
+    console.log("Roku IP Updated");
     return 'Roku IP Updated';
   }
   saveData() {

@@ -1,7 +1,8 @@
-import { Controller, Get, Query, Post } from '@nestjs/common';
+import { Controller, Get, Query, Post, Body, Req,Request } from '@nestjs/common';
 import {HueService} from './hue.service';
 import { stringify } from 'querystring';
 import { get } from 'http';
+import { settingsDTO } from './settingsDTO';
 
 @Controller('hue')
 export class HueController {
@@ -44,5 +45,41 @@ export class HueController {
         let data= await this.hueService.register(bridge);
         this.hueService.setHueIP(bridge);
         return data;
+    }
+
+    @Post("/settings")
+    async set(@Body() settings:settingsDTO)
+    {
+        
+        if(settings.bridgeIp)
+        {
+            this.hueService.setHueIP(settings.bridgeIp);
+        }
+
+        if(settings.hue)
+        {
+            this.hueService.setColor(settings.hue);
+        }
+
+        if(settings.hueGroup)
+        {
+            this.hueService.setGroup(settings.hueGroup);
+        }
+
+        if(settings.lightness)
+        {
+            
+        }
+
+        if(settings.rokuIP)
+        {
+            this.hueService.setRokuIP(settings.rokuIP);
+        }
+
+        if(settings.sat)
+        {
+            
+        }
+        return settings;
     }
 }
