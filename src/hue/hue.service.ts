@@ -14,43 +14,37 @@ export class HueService {
   constructor(private http: HttpService) {
     // this.setColor(0);
     // Get our settings here
-
-    
   }
 
   async getSettings() {
     try {
       let test = jsonfile.readFile('settings.json').then(result => {
         this.settings = result;
-        if(this.settings === new settingsDTO())
-        {
+        if (this.settings === new settingsDTO()) {
           console.log("The api won't work until all settings are set");
-        }
-        else
-        {
-        console.log(this.settings);
+        } else {
+          console.log(this.settings);
         }
       });
     } catch {
-      console.log("Couldn't get settings from settings.json")
+      console.log("Couldn't get settings from settings.json");
     }
   }
 
   private settings: settingsDTO = new settingsDTO();
 
-  setGroup(group:number)
-  {
+  setGroup(group: number) {
     this.settings.hueGroup = group;
     this.saveData();
-    console.log("Group has been set");
-    return "Group has been set";
+    console.log('Group has been set');
+    return 'Group has been set';
   }
 
   setColor(hue: number) {
     if (hue <= 65535 || hue >= 0) {
       this.settings.hue = hue;
       this.saveData();
-      console.log("Color set successfully");
+      console.log('Color set successfully');
       return 'Color has set sucessfully';
     } else {
       throw new HttpException(
@@ -75,7 +69,7 @@ export class HueService {
   setHueIP(ip: string) {
     this.settings.bridgeIp = ip;
     this.saveData();
-    console.log("Hue bridge IP updated");
+    console.log('Hue bridge IP updated');
     return 'Hue Bridge IP updated';
   }
 
@@ -100,9 +94,7 @@ export class HueService {
         },
       )
       .toPromise()
-      .then(res => {
-        console.log(res.data);
-      });
+      .then(res => {});
     return true;
   }
 
@@ -118,9 +110,7 @@ export class HueService {
         },
       )
       .toPromise()
-      .then(res => {
-        console.log(res.data);
-      });
+      .then(res => {});
     return true;
   }
 
@@ -139,7 +129,7 @@ export class HueService {
         data = response.data;
       });
     this.saveData();
-    console.log("Registered Hue Bridge");
+    console.log('Registered Hue Bridge');
     return data;
   }
 
@@ -152,7 +142,10 @@ export class HueService {
           let parseString = require('xml2js').parseString;
           parseString(res.data, (err, result) => {
             let state = result.player.$.state;
-            if (state === 'play') {
+            console.log('State: ' + state);
+            if (state === 'open') {
+              // Do nothing
+            } else if (state === 'play') {
               this.lightsDown();
             } else if (state === 'pause') {
               this.lightsUp();
@@ -162,10 +155,15 @@ export class HueService {
                 .toPromise()
                 .then(res => {
                   parseString(res.data, (err, result) => {
+                    console.log("Active App:" + JSON.stringify(result['active-app'].app))
                     
                     result = JSON.stringify(result);
-                    if (!result.includes('Roku')) {
-                      // Do nothing
+
+                    if (result.includes('tvinput')) {
+                      // do nothing
+                    } else if (!result.includes('Roku')) {
+                      // Turn the lights up
+
                       this.lightsUp();
                     }
                   });
@@ -179,21 +177,15 @@ export class HueService {
   setRokuIP(ip: string) {
     this.settings.rokuIP = ip;
     this.saveData();
-    console.log("Roku IP Updated");
+    console.log('Roku IP Updated');
     return 'Roku IP Updated';
   }
   saveData() {
     fs.writeFile('settings.json', JSON.stringify(this.settings));
   }
 
- async onModuleInit() {
-   
-    await this.getSettings().then(()=>{
-      
-    });
+  async onModuleInit() {
+    await this.getSettings().then(() => {});
     this.pollRoku();
-      
-    
-    
   }
 }
