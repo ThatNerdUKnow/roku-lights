@@ -27,7 +27,7 @@
     "file-system": "^2.2.2",
     "jsonfile": "^6.0.1",
     "reflect-metadata": "^0.1.13",
-    "rimraf": "^3.0.2",
+    "rimraf": "^4.0.0",
     "roku-client": "^4.2.0",
     "rxjs": "^6.5.4",
     "xml2js": "^0.4.23"
